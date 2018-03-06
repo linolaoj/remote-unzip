@@ -49,11 +49,11 @@ public class MyUnzipRemoteFile {
 		return null;
 	}
 
-	@RequestMapping(value="/fix/{version}/{fixPackId}", method=RequestMethod.GET)
+	@RequestMapping(value="/fixpack/{version}/{fixPackId}", method=RequestMethod.GET)
 	 ResponseEntity<Resource> getFixPackDoc(
 			 @RequestHeader(value="auth") String basicAuth,
 			 @PathVariable String version, @PathVariable String fixPackId) {
-	
+
 		String fixPackLink = "https://files.liferay.com/private/ee/fix-packs/" + version;
 
 		if ("7.0.10".equals(version)) {
@@ -64,7 +64,7 @@ public class MyUnzipRemoteFile {
 		}
 
 		_sendFileFromLink(basicAuth, fixPackLink);
-		
+
 		return null;
 	}
 
