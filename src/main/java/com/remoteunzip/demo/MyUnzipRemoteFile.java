@@ -48,9 +48,29 @@ public class MyUnzipRemoteFile {
 		return null;
 	}
 
+	@RequestMapping(value="/fix/{version}/{fixPackId}", method=RequestMethod.GET)
+	 ResponseEntity<Resource> getFixPackDoc(
+			 @RequestHeader(value="auth") String basicAuth,
+			 @PathVariable String version, @PathVariable String fixPackId) {
+	
+		String fixPackLink = "https://files.liferay.com/private/ee/fix-packs/" + version;
+
+		if ("7.0.10".equals(version)) {
+			fixPackLink = fixPackLink + "/de/liferay-fix-pack-de-" + fixPackId + ".zip";
+		}
+		else if ("6.2.10".equals(version)) {
+			fixPackLink = fixPackLink + "/portal/liferay-fix-pack-portal-" + fixPackId + ".zip";
+		}
+
+		String fixDoc = "fixpack_documentation.xml";
+
+		_sendFileFromLink(basicAuth, fixPackLink, fixDoc);
+		
+		return null;
+	}
 
 
-	private void _sendFileFromLink(String basicAuth, String hotfixLink, String fixDoc) {
+	private void _sendFileFromLink(String basicAuth, String patchLink, String fixDoc) {
 		byte[] credentials = Base64.getDecoder().decode(basicAuth);
 		
 		try {
@@ -63,7 +83,7 @@ public class MyUnzipRemoteFile {
 				
 			prepareAuthenticator(username, password);
 			
-			File extracted = extractFile(fixDoc, hotfixLink);
+			File extracted = extractFile(fixDoc, patchLink);
 			
 			if(extracted != null) {
 				
