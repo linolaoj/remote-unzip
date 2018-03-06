@@ -37,7 +37,7 @@ public class MyUnzipRemoteFile {
 	@RequestMapping(value="/hotfix/{version}/{fixid}", method=RequestMethod.GET)
 	 ResponseEntity<Resource> getHotfixDoc(
 			 @RequestHeader(value="auth") String basicAuth,
-			 @PathVariable String version,@PathVariable String fixid) {
+			 @PathVariable String version, @PathVariable String fixid) {
 	
 		String hotfixLink = "https://files.liferay.com/private/ee/fix-packs/" + version + "/hotfix/liferay-hotfix-" + fixid + ".zip";
 		
