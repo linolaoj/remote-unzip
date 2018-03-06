@@ -34,6 +34,9 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 public class MyUnzipRemoteFile {
 
 		
+	private static final String DOCUMENTATION_FILE_NAME = "fixpack_documentation.xml";
+
+
 	@RequestMapping(value="/hotfix/{version}/{fixid}", method=RequestMethod.GET)
 	 ResponseEntity<Resource> getHotfixDoc(
 			 @RequestHeader(value="auth") String basicAuth,
@@ -41,9 +44,7 @@ public class MyUnzipRemoteFile {
 	
 		String hotfixLink = "https://files.liferay.com/private/ee/fix-packs/" + version + "/hotfix/liferay-hotfix-" + fixid + ".zip";
 		
-		String fixDoc = "fixpack_documentation.xml";
-
-		_sendFileFromLink(basicAuth, hotfixLink, fixDoc);
+		_sendFileFromLink(basicAuth, hotfixLink);
 		
 		return null;
 	}
@@ -62,15 +63,13 @@ public class MyUnzipRemoteFile {
 			fixPackLink = fixPackLink + "/portal/liferay-fix-pack-portal-" + fixPackId + ".zip";
 		}
 
-		String fixDoc = "fixpack_documentation.xml";
-
-		_sendFileFromLink(basicAuth, fixPackLink, fixDoc);
+		_sendFileFromLink(basicAuth, fixPackLink);
 		
 		return null;
 	}
 
 
-	private void _sendFileFromLink(String basicAuth, String patchLink, String fixDoc) {
+	private void _sendFileFromLink(String basicAuth, String patchLink) {
 		byte[] credentials = Base64.getDecoder().decode(basicAuth);
 		
 		try {
@@ -83,7 +82,7 @@ public class MyUnzipRemoteFile {
 				
 			prepareAuthenticator(username, password);
 			
-			File extracted = extractFile(fixDoc, patchLink);
+			File extracted = extractFile(DOCUMENTATION_FILE_NAME, patchLink);
 			
 			if(extracted != null) {
 				
