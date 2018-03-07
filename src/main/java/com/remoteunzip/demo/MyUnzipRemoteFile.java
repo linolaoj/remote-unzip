@@ -44,9 +44,9 @@ public class MyUnzipRemoteFile {
 	
 		String hotfixLink = "https://files.liferay.com/private/ee/fix-packs/" + version + "/hotfix/liferay-hotfix-" + fixid + ".zip";
 		
-		_sendFileFromLink(basicAuth, hotfixLink);
+		return _sendFileFromLink(basicAuth, hotfixLink);
 		
-		return null;
+		
 	}
 
 	@RequestMapping(value="/fixpack/{version}/{fixPackId}", method=RequestMethod.GET)
@@ -63,13 +63,13 @@ public class MyUnzipRemoteFile {
 			fixPackLink = fixPackLink + "/portal/liferay-fix-pack-portal-" + fixPackId + ".zip";
 		}
 
-		_sendFileFromLink(basicAuth, fixPackLink);
+		return _sendFileFromLink(basicAuth, fixPackLink);
 
-		return null;
+		
 	}
 
 
-	private void _sendFileFromLink(String basicAuth, String patchLink) {
+	private ResponseEntity<Resource> _sendFileFromLink(String basicAuth, String patchLink) {
 		byte[] credentials = Base64.getDecoder().decode(basicAuth);
 		
 		try {
@@ -88,7 +88,7 @@ public class MyUnzipRemoteFile {
 				
 				ByteArrayResource resource = new ByteArrayResource(Files.readAllBytes(extracted.toPath()));
 
-			    ResponseEntity.ok()
+			  return  ResponseEntity.ok()
 			            .contentLength(extracted.length())
 			            .contentType(MediaType.parseMediaType("application/xml"/*"application/octet-stream"*/))
 			            .body(resource);
@@ -97,6 +97,8 @@ public class MyUnzipRemoteFile {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
+		return null;
 	}
 	
 	
