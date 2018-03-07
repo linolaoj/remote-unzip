@@ -32,10 +32,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 @RequestMapping("/unzip")
 @EnableAutoConfiguration
 public class MyUnzipRemoteFile {
-
 		
 	private static final String DOCUMENTATION_FILE_NAME = "fixpack_documentation.xml";
-
 
 	@RequestMapping(value="/hotfix/{version}/{fixid}", method=RequestMethod.GET)
 	 ResponseEntity<Resource> getHotfixDoc(
@@ -51,8 +49,8 @@ public class MyUnzipRemoteFile {
 
 	@RequestMapping(value="/fixpack/{version}/{fixPackId}", method=RequestMethod.GET)
 	 ResponseEntity<Resource> getFixPackDoc(
-			 @RequestHeader(value="auth") String basicAuth,
-			 @PathVariable String version, @PathVariable String fixPackId) {
+		 @RequestHeader(value="auth") String basicAuth,
+		 @PathVariable String version, @PathVariable String fixPackId) {
 
 		String fixPackLink = "https://files.liferay.com/private/ee/fix-packs/" + version;
 
@@ -64,8 +62,6 @@ public class MyUnzipRemoteFile {
 		}
 
 		return _sendFileFromLink(basicAuth, fixPackLink);
-
-		
 	}
 
 
@@ -88,13 +84,13 @@ public class MyUnzipRemoteFile {
 				
 				ByteArrayResource resource = new ByteArrayResource(Files.readAllBytes(extracted.toPath()));
 
-			  return  ResponseEntity.ok()
-			            .contentLength(extracted.length())
-			            .contentType(MediaType.parseMediaType("application/xml"/*"application/octet-stream"*/))
-			            .body(resource);
-				
+				return  ResponseEntity.ok()
+		            .contentLength(extracted.length())
+		            .contentType(MediaType.parseMediaType("application/xml"/*"application/octet-stream"*/))
+		            .body(resource);
 			}
-		} catch (IOException e) {
+		}
+		catch (IOException e) {
 			e.printStackTrace();
 		}
 		
@@ -121,7 +117,6 @@ public class MyUnzipRemoteFile {
 		
 		File tempFile = File.createTempFile(fileToExtract, "unziped");
 		
-		
 		FileOutputStream fos = new FileOutputStream(tempFile);
 		
 		int next = zin.read();
@@ -143,16 +138,13 @@ public class MyUnzipRemoteFile {
 	@Configuration
 	@EnableWebSecurity
 	public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
-
 		 
 		protected void configure(HttpSecurity http) throws Exception {
-			
 			 http
              .authorizeRequests()
              .anyRequest().permitAll();
 
 		}
-		
 		
 	   @Autowired
 	    public void configureGlobal(AuthenticationManagerBuilder auth)
@@ -161,11 +153,9 @@ public class MyUnzipRemoteFile {
 	            .inMemoryAuthentication()
 	                .withUser("user").password("password").roles("USER");
 	    	
-	    	
 	    }
 	
 	}
-	
 
 	private void prepareAuthenticator(String user, String password) {
 		Authenticator.setDefault (new Authenticator() {
