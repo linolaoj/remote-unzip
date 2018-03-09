@@ -58,7 +58,7 @@ public class MyUnzipRemoteFile {
 	}
 
    @ExceptionHandler(FileNotFoundException.class)
-   ResponseEntity<Object> handleEntityNotFound(
+   ResponseEntity<Object> handleFileNotFound(
 		   FileNotFoundException ex) {
 
 	   return new ResponseEntity<>(HttpStatus.NOT_FOUND);
