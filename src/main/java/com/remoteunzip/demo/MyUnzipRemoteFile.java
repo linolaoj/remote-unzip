@@ -1,17 +1,19 @@
 package com.remoteunzip.demo;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
 import java.nio.file.Files;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,8 +22,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.remoteunzip.demo.util.Credentials;
 import com.remoteunzip.demo.util.FileUtil;
+import com.remoteunzip.demo.util.PatchLinkUtil;
 
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -33,14 +35,13 @@ public class MyUnzipRemoteFile {
 		
 	private static final String DOCUMENTATION_FILE_NAME = "fixpack_documentation.xml";
 
-	private static final String BASE_URL = "https://files.liferay.com/private/ee/fix-packs/";
-	
 	@RequestMapping(value="/hotfix/{version}/{fixid}", method=RequestMethod.GET)
 	 ResponseEntity<Resource> getHotfixDoc(
 			 @RequestHeader(value="auth") String basicAuth,
-			 @PathVariable String version, @PathVariable String fixid) {
+			 @PathVariable String version, @PathVariable String fixid) 
+				throws FileNotFoundException {
 	
-		String hotfixLink = BASE_URL + version + "/hotfix/liferay-hotfix-" + fixid + ".zip";
+		String hotfixLink = PatchLinkUtil.buildHotfixLink(version, fixid);
 		
 		return sendFileFromLink(basicAuth, hotfixLink);
 	}
@@ -48,22 +49,24 @@ public class MyUnzipRemoteFile {
 	@RequestMapping(value="/fixpack/{version}/{fixPackId}", method=RequestMethod.GET)
 	 ResponseEntity<Resource> getFixPackDoc(
 		 @RequestHeader(value="auth") String basicAuth,
-		 @PathVariable String version, @PathVariable String fixPackId) {
+		 @PathVariable String version, @PathVariable String fixPackId) 
+			throws FileNotFoundException {
 
-		String fixPackLink = BASE_URL + version;
-
-		if ("7.0.10".equals(version)) {
-			fixPackLink = fixPackLink + "/de/liferay-fix-pack-de-" + fixPackId + ".zip";
-		}
-		else if ("6.2.10".equals(version)) {
-			fixPackLink = fixPackLink + "/portal/liferay-fix-pack-portal-" + fixPackId + ".zip";
-		}
-
-		return sendFileFromLink(basicAuth, fixPackLink);
+		String fixPackLink = PatchLinkUtil.buildFixpackLink(version, fixPackId);
+		
+		return  sendFileFromLink(basicAuth, fixPackLink);
 	}
 
+   @ExceptionHandler(FileNotFoundException.class)
+   ResponseEntity<Object> handleEntityNotFound(
+		   FileNotFoundException ex) {
 
-	private ResponseEntity<Resource> sendFileFromLink(String basicAuth, String patchLink) {
+	   return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+   }
+	
+
+	private ResponseEntity<Resource> sendFileFromLink(String basicAuth, String patchLink) 
+		throws FileNotFoundException {
 		
 		try {
 			prepareAuthenticator(new Credentials(basicAuth));
@@ -81,6 +84,9 @@ public class MyUnzipRemoteFile {
 			}
 		}
 		catch (IOException e) {
+			if(e instanceof FileNotFoundException) {
+				throw new FileNotFoundException();
+			}
 			e.printStackTrace();
 		}
 		
