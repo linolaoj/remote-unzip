@@ -28,13 +28,25 @@ public class MyUnzipRemoteFileTests {
 	}
 
 	@Test
-	public void fetchHotfixInfoTest() {
+	public void getHotfixDocResponseStatusTest() {
 		Credentials credentials = new Credentials(properties.getUsername(), properties.getPassword());
 		
 		String basicAuth = 	credentials.getBasicAuth();
 		
 		this.webClient.get()
 		.uri("http://localhost:8080/unzip/hotfix/7.0.10/1222-7010")
+		.header("auth", basicAuth).exchange().expectStatus().isOk();
+		
+	}
+	
+	@Test
+	public void getFixPackDocResponseStatusTest() {
+		Credentials credentials = new Credentials(properties.getUsername(), properties.getPassword());
+		
+		String basicAuth = 	credentials.getBasicAuth();
+		
+		this.webClient.get()
+		.uri("http://localhost:8080/unzip/fixpack/6.2.10/164-6210")
 		.header("auth", basicAuth).exchange().expectStatus().isOk();
 		
 	}
