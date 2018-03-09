@@ -1,14 +1,9 @@
 package com.remoteunzip.demo;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
-import java.net.URL;
 import java.nio.file.Files;
-import java.util.Base64;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -22,11 +17,14 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.remoteunzip.demo.util.Credentials;
+import com.remoteunzip.demo.util.FileUtil;
+
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-
 
 @RestController
 @RequestMapping("/unzip")
@@ -35,16 +33,16 @@ public class MyUnzipRemoteFile {
 		
 	private static final String DOCUMENTATION_FILE_NAME = "fixpack_documentation.xml";
 
+	private static final String BASE_URL = "https://files.liferay.com/private/ee/fix-packs/";
+	
 	@RequestMapping(value="/hotfix/{version}/{fixid}", method=RequestMethod.GET)
 	 ResponseEntity<Resource> getHotfixDoc(
 			 @RequestHeader(value="auth") String basicAuth,
 			 @PathVariable String version, @PathVariable String fixid) {
 	
-		String hotfixLink = "https://files.liferay.com/private/ee/fix-packs/" + version + "/hotfix/liferay-hotfix-" + fixid + ".zip";
+		String hotfixLink = BASE_URL + version + "/hotfix/liferay-hotfix-" + fixid + ".zip";
 		
-		return _sendFileFromLink(basicAuth, hotfixLink);
-		
-		
+		return sendFileFromLink(basicAuth, hotfixLink);
 	}
 
 	@RequestMapping(value="/fixpack/{version}/{fixPackId}", method=RequestMethod.GET)
@@ -52,7 +50,7 @@ public class MyUnzipRemoteFile {
 		 @RequestHeader(value="auth") String basicAuth,
 		 @PathVariable String version, @PathVariable String fixPackId) {
 
-		String fixPackLink = "https://files.liferay.com/private/ee/fix-packs/" + version;
+		String fixPackLink = BASE_URL + version;
 
 		if ("7.0.10".equals(version)) {
 			fixPackLink = fixPackLink + "/de/liferay-fix-pack-de-" + fixPackId + ".zip";
@@ -61,24 +59,16 @@ public class MyUnzipRemoteFile {
 			fixPackLink = fixPackLink + "/portal/liferay-fix-pack-portal-" + fixPackId + ".zip";
 		}
 
-		return _sendFileFromLink(basicAuth, fixPackLink);
+		return sendFileFromLink(basicAuth, fixPackLink);
 	}
 
 
-	private ResponseEntity<Resource> _sendFileFromLink(String basicAuth, String patchLink) {
-		byte[] credentials = Base64.getDecoder().decode(basicAuth);
+	private ResponseEntity<Resource> sendFileFromLink(String basicAuth, String patchLink) {
 		
 		try {
-
-			String[] credentialsArray = new String(credentials, "UTF-8").split(":");
+			prepareAuthenticator(new Credentials(basicAuth));
 			
-			String username = credentialsArray[0];
-			
-			String password = credentialsArray[1];	
-				
-			prepareAuthenticator(username, password);
-			
-			File extracted = extractFile(DOCUMENTATION_FILE_NAME, patchLink);
+			File extracted = FileUtil.extractFile(DOCUMENTATION_FILE_NAME, patchLink);
 			
 			if(extracted != null) {
 				
@@ -97,44 +87,6 @@ public class MyUnzipRemoteFile {
 		return null;
 	}
 	
-	
-	
-	public File extractFile(String fileToExtract, String zipUrl) 
-		throws IOException {
-		
-		if(fileToExtract == null || zipUrl == null)
-			return null;
-		
-		URL url = new URL(zipUrl);
-		
-		ZipInputStream zin = new ZipInputStream(url.openStream());
-		ZipEntry ze = zin.getNextEntry();
-		
-		while (!ze.getName().equals(fileToExtract)) {
-		    zin.closeEntry();
-		    ze = zin.getNextEntry();
-		}
-		
-		File tempFile = File.createTempFile(fileToExtract, "unziped");
-		
-		FileOutputStream fos = new FileOutputStream(tempFile);
-		
-		int next = zin.read();
-
-		while(next != -1) {
-			
-			fos.write(next);
-			next = zin.read();
-			
-		} 
-		
-		fos.flush();
-		fos.close();
-		
-		return tempFile;
-	}
-
-
 	@Configuration
 	@EnableWebSecurity
 	public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
@@ -157,10 +109,13 @@ public class MyUnzipRemoteFile {
 	
 	}
 
-	private void prepareAuthenticator(String user, String password) {
+	private void prepareAuthenticator(Credentials credentials) {
+		String username = credentials.getUsername();
+		String password = credentials.getPassword();	
+		
 		Authenticator.setDefault (new Authenticator() {
 		    protected PasswordAuthentication getPasswordAuthentication() {
-		        return new PasswordAuthentication (user, password.toCharArray());
+		        return new PasswordAuthentication (username, password.toCharArray());
 		    }
 		});
 	}
