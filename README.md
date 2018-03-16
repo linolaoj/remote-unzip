@@ -7,4 +7,4 @@ The purpose of this project is to retrieve documentation from hotfix/fixpack wit
 * Run **gradle test** to run tests
 
 ## How to build Docker image
-* Run **gradle buildDocker**
+* Run **gradle buildDocker -x test**
