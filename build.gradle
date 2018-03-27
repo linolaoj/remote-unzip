@@ -45,7 +45,7 @@ task buildDocker(type: Docker, dependsOn: build) {
   dockerfile = file('Dockerfile')
   doFirst {
     copy {
-      from jar
+      from bootJar
       into "${stageDir}/target"
     }
   }
