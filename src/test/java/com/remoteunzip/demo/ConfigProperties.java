@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @PropertySource("classpath:test.properties")
-@ConfigurationProperties
+@ConfigurationProperties(prefix = "patcher")
 public class ConfigProperties {
 
 	       
