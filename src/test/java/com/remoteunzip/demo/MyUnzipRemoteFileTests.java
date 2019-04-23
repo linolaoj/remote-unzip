@@ -19,10 +19,6 @@ import com.remoteunzip.demo.util.Credentials;
 @SpringBootTest
 public class MyUnzipRemoteFileTests {
 
-	private WebTestClient webClient = WebTestClient.bindToServer() 
-            .responseTimeout(Duration.ofMillis(10000)).build();
-		
-	
 	private ConfigProperties properties;
 	
 	@Autowired
@@ -36,7 +32,9 @@ public class MyUnzipRemoteFileTests {
 		
 		String basicAuth = 	credentials.getBasicAuth();
 		
-		this.webClient.get()
+		WebTestClient webClient = getWebTestClient();
+		
+		webClient.get()
 		.uri("http://localhost:8080/unzip/hotfix/7.0.10/1222-7010")
 		.header("auth", basicAuth).exchange().expectStatus().isOk();
 		
@@ -48,7 +46,9 @@ public class MyUnzipRemoteFileTests {
 		
 		String basicAuth = 	credentials.getBasicAuth();
 		
-		this.webClient.get()
+		WebTestClient webClient = getWebTestClient();
+
+		webClient.get()
 		.uri("http://localhost:8080/unzip/fixpack/6.2.10/164-6210")
 		.header("auth", basicAuth).exchange().expectStatus().isOk();
 		
@@ -60,7 +60,9 @@ public class MyUnzipRemoteFileTests {
 		
 		String basicAuth = 	credentials.getBasicAuth();
 		
-		this.webClient.get()
+		WebTestClient webClient = getWebTestClient();
+
+		webClient.get()
 		.uri("http://localhost:8080/unzip/fixpack/6.2.10/164-6210")
 		.header("auth", basicAuth).exchange().expectStatus().isOk().expectBody()
 		.consumeWith(response ->{
@@ -84,7 +86,9 @@ public class MyUnzipRemoteFileTests {
 		
 		String basicAuth = 	credentials.getBasicAuth();
 		
-		this.webClient.get()
+		WebTestClient webClient = getWebTestClient();
+
+		webClient.get()
 		.uri("http://localhost:8080/unzip/hotfix/7.0.10/1222-7010")
 		.header("auth", basicAuth).exchange().expectStatus().isOk().expectBody()
 		.consumeWith(response ->{
@@ -100,5 +104,10 @@ public class MyUnzipRemoteFileTests {
 			Assert.assertEquals(76752134, patchJson.getLong("build-id"));
 		});
 		
+	}
+
+	private WebTestClient getWebTestClient() {
+		return WebTestClient.bindToServer() 
+		.responseTimeout(Duration.ofMillis(10000)).build();
 	}
 }
