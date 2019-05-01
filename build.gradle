@@ -25,10 +25,8 @@ repositories {
 	mavenCentral()
 }
 
-
 dependencies {
 	compile('org.springframework.boot:spring-boot-starter-webflux')
-
 	compile('org.springframework.boot:spring-boot-starter-data-rest')
 	compile('org.springframework.boot:spring-boot-starter-jersey')
 	compile('org.springframework.boot:spring-boot-starter-web')
@@ -36,8 +34,7 @@ dependencies {
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 	testCompile('org.springframework.boot:spring-boot-starter-reactor-netty')
 	testCompile('io.projectreactor:reactor-test')
-	testCompile('org.json:json:20171018')
-
+	compile('org.json:json:20180813')
 }
 
 task buildDocker(type: Docker, dependsOn: build) {
