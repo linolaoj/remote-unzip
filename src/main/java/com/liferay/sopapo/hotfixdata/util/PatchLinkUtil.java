@@ -8,12 +8,12 @@ import org.springframework.stereotype.Component;
 public class PatchLinkUtil {
 
 	public String buildHotfixLink(String version, String fixid) {
-		
+
 		return getFixpacksBaseURL() + version + "/hotfix/liferay-hotfix-" + fixid + ".zip";
 	}
-	
+
 	public String buildFixpackLink(String version, String fixPackId) {
-		
+
 		String fixPackLink = getFixpacksBaseURL() + version;
 
 		if ("7.0.10".equals(version)) {
@@ -22,7 +22,7 @@ public class PatchLinkUtil {
 		else if ("6.2.10".equals(version)) {
 			fixPackLink = fixPackLink + "/portal/liferay-fix-pack-portal-" + fixPackId + ".zip";
 		}
-		
+
 		return fixPackLink;
 	}
 
