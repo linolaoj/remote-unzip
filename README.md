@@ -3,8 +3,9 @@ The purpose of this project is to retrieve documentation from hotfix/fixpack wit
 
 ## How to run the service
 * Set up the liferayAuthURL and fixpacksBaseURL on **src/main/resources/application.properties**
-* Run gradle bootRun
-To know more about configuration properties please see: https://www.baeldung.com/configuration-properties-in-spring-boot 
+* Run gradle **bootRun**
+
+(To know more about configuration properties please see: https://www.baeldung.com/configuration-properties-in-spring-boot)
 
 ## How to run tests
 * Add your config on **src/test/resource/test.properties**
