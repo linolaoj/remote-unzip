@@ -12,5 +12,7 @@ The purpose of this project is to retrieve documentation from hotfix/fixpack wit
 * Run **gradle appengineRun** to start server
 * Run **gradle test** to run tests
 
+To run this project you need to have installed the Google Cloud SDK. Please see https://cloud.google.com/sdk/install to know more about it. 
+
 ## How to build Docker image
 * Run **gradle buildDocker -x test**
