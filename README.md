@@ -8,7 +8,7 @@ The purpose of this project is to retrieve documentation from hotfix/fixpack wit
 (To know more about configuration properties please see: https://www.baeldung.com/configuration-properties-in-spring-boot)
 
 ## How to run tests
-* Set up *username* and *password* with prefix *patcher* on **src/test/resource/test.properties**
+* Set up *username* and *password* with prefix *patcher* on **src/test/resources/test.properties**
 * Run **gradle appengineRun** to start server
 * Run **gradle test** to run tests
 
