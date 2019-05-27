@@ -33,6 +33,11 @@ dependencies {
         exclude group: 'org.springframework.boot', module: 'spring-boot-starter-tomcat'
     }
 	compile("org.springframework.boot:spring-boot-starter-security")
+	
+	testCompile('org.springframework.boot:spring-boot-starter-webflux')
+	testCompile('org.springframework.boot:spring-boot-starter-data-rest')
+	testCompile('org.springframework.boot:spring-boot-starter-jersey')
+	testCompile('org.springframework.boot:spring-boot-starter-web')
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 	testCompile('org.springframework.boot:spring-boot-starter-reactor-netty')
 
