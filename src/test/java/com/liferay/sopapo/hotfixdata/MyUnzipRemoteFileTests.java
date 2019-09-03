@@ -79,6 +79,32 @@ public class MyUnzipRemoteFileTests {
 		});
 
 	}
+	
+	@Test
+	public void getFixpack72DocResponseContentTest() {
+		String username = properties.getUsername();
+		String password = properties.getPassword();
+		WebTestClient webClient = getWebTestClient();
+
+		webClient.get()
+		.uri("http://localhost:8080/unzip/fixpack/7.2.10/1-7210")
+		.header("Authorization",
+				getAuthorization(username, password))
+		.exchange().expectStatus().isOk().expectBody()
+		.consumeWith(response ->{
+			Assertions.assertThat(response.getResponseBody()).isNotNull();
+
+			String body = new String(response.getResponseBody());
+
+			JSONObject fixDocJson = new JSONObject(body);
+
+			JSONObject patchJson = fixDocJson.getJSONObject("patch");
+
+			Assert.assertEquals("dxp-1-7210", patchJson.getString("id"));
+			Assert.assertEquals("dxp-1", patchJson.getString("build-name"));
+		});
+
+	}
 
 	@Test
 	public void getHotfixDocResponseContentTest() {
