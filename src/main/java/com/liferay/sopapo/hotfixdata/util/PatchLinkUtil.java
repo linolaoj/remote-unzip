@@ -1,5 +1,6 @@
 package com.liferay.sopapo.hotfixdata.util;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
@@ -14,16 +15,14 @@ public class PatchLinkUtil {
 
 	public String buildFixpackLink(String version, String fixPackId) {
 
-		String fixPackLink = getFixpacksBaseURL() + version;
+		String fixpackLink = getFixpacksBaseURL() + version;
 
-		if ("7.0.10".equals(version)) {
-			fixPackLink = fixPackLink + "/de/liferay-fix-pack-de-" + fixPackId + ".zip";
-		}
-		else if ("6.2.10".equals(version)) {
-			fixPackLink = fixPackLink + "/portal/liferay-fix-pack-portal-" + fixPackId + ".zip";
-		}
+		FixpackLinkBuilder fixpackLinkBuilder =
+			fixpackLinkBuilderRegister.getFixpackLinkBuilder(version);
+		
+		fixpackLink = fixpackLink + fixpackLinkBuilder.buildFixpackLink(fixPackId);
 
-		return fixPackLink;
+		return fixpackLink;
 	}
 
 	public String getFixpacksBaseURL() {
@@ -34,5 +33,8 @@ public class PatchLinkUtil {
 		this.fixpacksBaseURL = fixpacksBaseURL;
 	}
 
+	@Autowired
+	private FixpackLinkBuilderRegister fixpackLinkBuilderRegister;
+	
 	private String fixpacksBaseURL;
 }
