@@ -13,7 +13,22 @@ jobs:
       - uses: actions/setup-java@v1
         with:
           java-version: 1.8
-          
+     
+      - name: Add the Cloud SDK distribution URI as a package source
+        run: echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+    
+      - name: Make sure apt-transport-https is installed
+        run: sudo apt-get install apt-transport-https ca-certificates gnupg
+           
+      - name: Install curl
+        run: sudo apt-get install curl
+      
+      - name: Import the Google Cloud public key
+        run:  curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key --keyring /usr/share/keyrings/cloud.google.gpg add -
+
+      - name: Update and install the Cloud SDK
+        run: sudo apt-get update && sudo apt-get install google-cloud-sdk
+      
       - name: Install gcloud components
         run: sudo apt-get install google-cloud-sdk-app-engine-java
      
