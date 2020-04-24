@@ -15,4 +15,5 @@ limitations under the License.
   <threadsafe>true</threadsafe>
   <runtime>java8</runtime>
   <sessions-enabled>true</sessions-enabled>
+  <url-stream-handler>urlfetch</url-stream-handler>
 </appengine-web-app>
