@@ -1,4 +1,4 @@
-# remote-unzip
+# Remote-unzip
 The purpose of this project is to retrieve documentation from hotfix/fixpack without having to download the entire zip file.
 
 ## How to run the service
