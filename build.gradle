@@ -49,6 +49,16 @@ dependencies {
 	compile('com.google.appengine:appengine-api-1.0-sdk:+')
 }
 
+/** Uncomment to debug.
+
+appengine {
+    run {
+        jvmFlags = ['-Xdebug', '-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8000']
+    }
+}
+
+**/
+
 task buildDocker(type: Docker, dependsOn: build) {
   applicationName = jar.baseName
   dockerfile = file('Dockerfile')
