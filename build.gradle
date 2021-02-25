@@ -33,7 +33,9 @@ dependencies {
         exclude group: 'org.springframework.boot', module: 'spring-boot-starter-tomcat'
     }
 	compile("org.springframework.boot:spring-boot-starter-security")
-	
+		
+	compile("com.konghq:unirest-java:3.11.09")
+
 	testCompile('org.springframework.boot:spring-boot-starter-webflux')
 	testCompile('org.springframework.boot:spring-boot-starter-data-rest')
 	testCompile('org.springframework.boot:spring-boot-starter-jersey')
