@@ -8,6 +8,8 @@ import java.net.PasswordAuthentication;
 import java.nio.file.Files;
 
 import com.liferay.sopapo.hotfixdata.util.FileUtil;
+import com.liferay.sopapo.hotfixdata.util.FixSpecification;
+import com.liferay.sopapo.hotfixdata.util.FixSpecificationRegister;
 import com.liferay.sopapo.hotfixdata.util.PatchLinkUtil;
 import org.json.JSONObject;
 import org.json.XML;
@@ -31,10 +33,10 @@ import org.springframework.web.bind.annotation.RestController;
 @EnableAutoConfiguration
 public class MyUnzipRemoteFile {
 
-
     @Autowired
     private PatchLinkUtil patchLinkUtil;
-    private static final String DOCUMENTATION_FILE_NAME = "fixpack_documentation.xml";
+    @Autowired
+    private FixSpecificationRegister fixSpecificationRegister;
 
     @GetMapping("/hotfix/{version}/{fixid}")
     ResponseEntity<Resource> getHotfixDoc(
@@ -42,9 +44,12 @@ public class MyUnzipRemoteFile {
             @PathVariable String fixid)
             throws FileNotFoundException {
 
-        String hotfixLink = patchLinkUtil.buildHotfixLink(version, fixid);
+        FixSpecification fixSpecification =
+            fixSpecificationRegister.getFixSpecification(version);
 
-        return sendFileFromLink(auth, hotfixLink);
+        String hotfixLink = patchLinkUtil.buildHotfixLink(version, fixid);
+       
+        return sendFileFromLink(auth, hotfixLink, fixSpecification);
     }
 
     @GetMapping("/fixpack/{version}/{fixPackId}")
@@ -53,9 +58,12 @@ public class MyUnzipRemoteFile {
             @PathVariable String fixPackId)
             throws FileNotFoundException {
 
+        FixSpecification fixSpecification =
+            fixSpecificationRegister.getFixSpecification(version);
+        
         String fixPackLink = patchLinkUtil.buildFixpackLink(version, fixPackId);
 
-        return sendFileFromLink(auth, fixPackLink);
+        return sendFileFromLink(auth, fixPackLink, fixSpecification);
     }
 
     @ExceptionHandler(FileNotFoundException.class)
@@ -66,18 +74,22 @@ public class MyUnzipRemoteFile {
     }
 
 
-    private ResponseEntity<Resource> sendFileFromLink(Authentication auth, String patchLink)
+    private ResponseEntity<Resource> sendFileFromLink(Authentication auth, String patchLink, FixSpecification fixSpecification)
             throws FileNotFoundException {
 
         try {
             prepareAuthenticator(auth);
 
-            File extracted = FileUtil.extractFile(DOCUMENTATION_FILE_NAME, patchLink);
+            File extracted = FileUtil.extractFile(fixSpecification.getDocumentationFileName(), patchLink);
 
             if (extracted != null) {
 
-                JSONObject obj = XML.toJSONObject(new String(Files.readAllBytes(extracted.toPath())));
+                String rawContent = new String(Files.readAllBytes(extracted.toPath()));
+
+                JSONObject obj = extractJsonObject(rawContent, fixSpecification.getDocumentationContentFormat());
+
                 ByteArrayResource resource = new ByteArrayResource(obj.toString().getBytes());
+                
                 return ResponseEntity.ok()
                         .contentLength(resource.contentLength())
                         .contentType(MediaType.APPLICATION_JSON_UTF8)
@@ -91,6 +103,13 @@ public class MyUnzipRemoteFile {
         }
 
         return null;
+    }
+
+    private JSONObject extractJsonObject(String content, String contentFormat) {
+        if("json".equalsIgnoreCase(contentFormat)) {
+            return new JSONObject(content);
+        }
+        return XML.toJSONObject(content);
     }
 
     private void prepareAuthenticator(Authentication auth) {

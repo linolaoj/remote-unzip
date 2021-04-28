@@ -17,10 +17,10 @@ public class PatchLinkUtil {
 
 		String fixpackLink = getFixpacksBaseURL() + version;
 
-		FixpackLinkBuilder fixpackLinkBuilder =
-			fixpackLinkBuilderRegister.getFixpackLinkBuilder(version);
+		FixSpecification fixSpecification =
+			fixSpecificationRegister.getFixSpecification(version);
 		
-		fixpackLink = fixpackLink + fixpackLinkBuilder.buildFixpackLink(fixPackId);
+		fixpackLink = fixpackLink + fixSpecification.buildFixpackLink(fixPackId);
 
 		return fixpackLink;
 	}
@@ -34,7 +34,7 @@ public class PatchLinkUtil {
 	}
 
 	@Autowired
-	private FixpackLinkBuilderRegister fixpackLinkBuilderRegister;
+	private FixSpecificationRegister fixSpecificationRegister;
 	
 	private String fixpacksBaseURL;
 }
