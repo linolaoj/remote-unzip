@@ -3,7 +3,7 @@ package com.liferay.sopapo.hotfixdata.util;
 import org.springframework.stereotype.Component;
 
 @Component
-public class FixpackLInkBuilder71x implements FixpackLinkBuilder {
+public class FixSpecification72 extends FixSpecification62 {
 
 	@Override
 	public String buildFixpackLink(String fixPackId) {
@@ -12,7 +12,7 @@ public class FixpackLInkBuilder71x implements FixpackLinkBuilder {
 
 	@Override
 	public String getVersion() {
-		return "7.1.10";
+		return "7.2.10";
 	}
 
 }
